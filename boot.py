@@ -25,8 +25,8 @@ def paint_dice(np, value, background):
 
 def get_sides(np, button_pin):
     while(True):
-        for sides in range(1, 10):
-            paint_dice(np, sides, (0, 0, 20))
+        for sides in range(2, 10):
+            paint_dice(np, sides, BLUE)
             sleep(1)
             if (button_pin.value() == 0):
                 return sides
@@ -67,19 +67,45 @@ def rolling(np, imu):
                     candidate_found = True
                     break
 
-        paint_dice(np, candidate, (20, 0, 0))
-
-
+        paint_dice(np, candidate, RED)
         if (distance < 1.0):
             quiet_interval = quiet_interval - 1
         else:
             quiet_interval = 10
-
         base_ax, base_ay, base_az = imu.getAccelData()
         sleep(0.2)
 
         if quiet_interval < 1:
             return(candidate)
+
+
+def color_chase(np, color, wait):
+    for i in range(25):
+        np[i] = color
+        sleep(wait)
+        np.write()
+        sleep(wait)
+
+def wheel(pos):
+    # Input a value 0 to 255 to get a color value.
+    # The colours are a transition r - g - b - back to r.
+    if pos < 0 or pos > 255:
+        return (0, 0, 0)
+    if pos < 85:
+        return (255 - pos * 3, pos * 3, 0)
+    if pos < 170:
+        pos -= 85
+        return (0, 255 - pos * 3, pos * 3)
+    pos -= 170
+    return (pos * 3, 0, 255 - pos * 3)
+
+def rainbow_cycle(np, wait):
+    for j in range(255):
+        for i in range(25):
+            rc_index = (i * 256 // 25) + j
+            (r, g, b) = wheel(rc_index & 255)
+            np[i] = (round(r/10), round(g/10), round(b/10))
+        np.write()
 
 dice = {}
 dice[0] = [
@@ -153,9 +179,20 @@ dice[9] = [
     1,0,1,0,1,
 ]
 
+BLACK  = ( 0,  0,  0)
+RED    = (25,  0,  0)
+YELLOW = (25, 15,  0)
+GREEN  = ( 0, 25,  0)
+CYAN   = ( 0, 25, 25)
+BLUE   = ( 0,  0, 25)
+PURPLE = (18,  0, 25)
+WHITE  = (25, 25, 25)
+
 neopixel_pin = Pin(27, Pin.OUT)
 np = NeoPixel(neopixel_pin, 25)
-paint_dice(np, 0, (0, 0, 0))
+paint_dice(np, 0, BLACK)
+
+rainbow_cycle(np, 0.01)
 
 sta_if = network.WLAN(network.STA_IF)
 ap_if = network.WLAN(network.AP_IF)
@@ -178,6 +215,9 @@ print('start')
 print('get_sides')
 sides = get_sides(np, button_pin)
 print('\t return '+str(sides))
+paint_dice(np, sides, (0, 0, 0))
+sleep(1)
+paint_dice(np, 0, BLACK)
 
 while(True):
     print('wait_for_a_shake')
@@ -185,4 +225,4 @@ while(True):
     print('rolling ...')
     candidate = rolling(np, imu)
     print('\t return '+str(candidate))
-    paint_dice(np, candidate, (0, 20, 0))
+    paint_dice(np, candidate, GREEN)
