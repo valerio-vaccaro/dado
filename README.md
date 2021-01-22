@@ -3,24 +3,26 @@ A M5Atom based dice with configurable number of sides (2-9)
 
 ## Install the script
 
-Set enviroment (ESPPORT can change on your operative system).
+Set enviroment (ESPPORT can change on your operative system e.g. /dev/ttyUSB0 on Linux).
 
 ```
-ESPPORT=/dev/cu.usbserial-00001014
+ESPPORT=/dev/cu.usbserial-00001014 
 BAUDRATE=115200
 ```
 
 Download and install MicroPython on M5Atom using esptool.
 
 ```
-wget https://micropython.org/resources/firmware/esp32-idf4-20200329-v1.12-317-g688323307.bin
+wget https://micropython.org/resources/firmware/esp32-idf4-20200902-v1.13.bin
 esptool.py --chip esp32 --port $ESPPORT erase_flash
 esptool.py --chip esp32 --port $ESPPORT --baud $BAUDRATE write_flash -z 0x1000 esp32-idf4-20200329-v1.12-317-g688323307.bin
 ```
 
-Install scripts using ampy.
+Install scripts using ampy (if you don't have please install adafruit-ampy via pip3).
 
 ```
+git clone https://github.com/valerio-vaccaro/dado.git
+cd dado
 ampy -p $ESPPORT -b $BAUDRATE put mpu6886.py
 ampy -p $ESPPORT -b $BAUDRATE put boot.py
 ```
