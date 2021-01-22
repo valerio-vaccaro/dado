@@ -16,6 +16,7 @@ Download and install MicroPython on M5Atom using esptool.
 wget https://micropython.org/resources/firmware/esp32-idf4-20200902-v1.13.bin
 esptool.py --chip esp32 --port $ESPPORT erase_flash
 esptool.py --chip esp32 --port $ESPPORT --baud $BAUDRATE write_flash -z 0x1000 esp32-idf4-20200902-v1.13.bin
+```
 
 Install scripts using ampy (if you don't have please install adafruit-ampy via pip3).
 
